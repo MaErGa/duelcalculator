@@ -77,7 +77,8 @@ html, body {
 
 @media (max-width: 820px) {
   .board {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
   }
 }
@@ -85,8 +86,7 @@ html, body {
 /* ---------- PLAYER PANEL ---------- */
 .player {
   position: relative;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -154,11 +154,6 @@ html, body {
     0 0 0 2px #000,
     0 0 0 4px var(--yellow),
     0 8px 22px rgba(0,0,0,0.5);
-}
-
-.lp-counter {
-  display: flex;
-  gap: 2px;
 }
 
 .lp-counter {
@@ -423,6 +418,16 @@ html, body {
     border-left: none;
     border-right: none;
     border-bottom: 1px solid #1d2038;
+  }
+
+  .player {
+    justify-content: flex-start;
+    padding-top: 26px;
+    flex-shrink: 0;
+  }
+
+  .center-zone {
+    flex-shrink: 0;
   }
 }
 
