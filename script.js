@@ -11,7 +11,7 @@ const DIGIT_HEIGHT_VAR = '--digit-h'; // referencia, la altura real se mide en r
 // ====== ANIMACIÓN DE CONTEO (igual al efecto del video de referencia) ======
 
 // Cada contador lleva registro de su valor actualmente mostrado y de
-// la animación en curso, para poder encadenar cambios rápidos sin trabarse.
+// la animación en curso, para poder encadenar cambios rápidos sin interrupciones.
 const counters = {}; // { lp1: { shown, raf, target } }
 
 function ensureCounter(id, initialValue) {
@@ -28,7 +28,7 @@ function animateCounter(containerEl, id, from, to) {
   ensureCounter(id, from);
   const counterState = counters[id];
 
-  // Si ya había una animación corriendo, la cancelamos para arrancar limpio.
+  // Si ya había una animación corriendo, la cancelamos para empezar limpio.
   if (counterState.raf) {
     cancelAnimationFrame(counterState.raf);
   }
@@ -277,7 +277,7 @@ const dieFaceRotation = {
   4: { x: 0, y: 90 },
 };
 
-let dieSpinsX = -15; // arranca igual que la rotación inicial en reposo
+let dieSpinsX = -15; // empieza igual que la rotación inicial en reposo
 let dieSpinsY = 25;
 
 document.getElementById('diceRollBtn').addEventListener('click', () => {

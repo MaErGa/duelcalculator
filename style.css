@@ -142,7 +142,7 @@ html, body {
   outline: 2px solid var(--yellow);
 }
 
-/* ---------- LP DISPLAY (digit roller) ---------- */
+/* ---------- TARJETA DE LP ---------- */
 .lp-display {
   display: flex;
   justify-content: center;
@@ -431,6 +431,81 @@ html, body {
   }
 }
 
+/* ---------- MÓVIL EN HORIZONTAL (LANDSCAPE) ---------- */
+@media (max-width: 920px) and (orientation: landscape) {
+  .board {
+    display: flex;
+    flex-direction: row;
+    overflow-y: visible;
+  }
+
+  .player {
+    flex: 1;
+    order: 0;
+    justify-content: flex-start;
+    padding-top: 14px;
+    gap: 8px;
+    overflow-y: auto;
+    max-height: 100%;
+  }
+
+  .center-zone {
+    order: 0;
+    flex-shrink: 0;
+    width: 150px;
+    border-bottom: none;
+    border-left: 1px solid #1d2038;
+    border-right: 1px solid #1d2038;
+    overflow-y: auto;
+    max-height: 100%;
+    gap: 10px;
+    padding: 10px 8px;
+  }
+
+  .lp-counter {
+    font-size: clamp(28px, 6vw, 40px);
+  }
+
+  .lp-display {
+    padding: 8px 12px;
+  }
+
+  .player-name {
+    font-size: 0.85rem;
+    padding: 5px 6px;
+  }
+
+  .btn {
+    padding: 7px 8px;
+    font-size: 0.78rem;
+    min-width: 50px;
+  }
+
+  .history-box {
+    max-height: 70px;
+  }
+
+  .coin-wrap,
+  .die-wrap {
+    width: 56px;
+    height: 56px;
+  }
+
+  .randomizers {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .randomizer-block {
+    gap: 6px;
+  }
+
+  .start-lp {
+    padding: 6px 8px;
+  }
+}
+
 .randomizers {
   display: flex;
   gap: 22px;
@@ -643,7 +718,7 @@ html, body {
   margin-top: 4px;
 }
 
-/* small screens fine-tune */
+/* ---------- ajustes para pantallas pequeñas ---------- */
 @media (max-width: 480px) {
   .top-bar h1 { font-size: 1.05rem; }
   .btn { padding: 9px 10px; font-size: 0.85rem; min-width: 56px; }
