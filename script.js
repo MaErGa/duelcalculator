@@ -328,6 +328,135 @@ function rollDieTo(die, result) {
   die.style.transform = `rotateX(${dieSpinsX}deg) rotateY(${dieSpinsY}deg)`;
 }
 
+// ====== SCROLL POR INCLINACIÓN (GIROSCOPIO) ======
+//
+// Al activarlo, el primer valor de "beta" (inclinación adelante/atrás del
+// móvil) que llega se guarda como posición neutra. A partir de ahí, cuanto
+// más se incline el teléfono hacia adelante o hacia atrás respecto a esa
+// posición, más rápido se hace scroll hacia abajo o hacia arriba. Se aplica
+// una "zona muerta" para que pequeños temblores de la mano no muevan nada.
+
+const tiltScroll = {
+  active: false,
+  neutralBeta: null,
+  currentDelta: 0,
+  rafId: null,
+  deadZone: 6,      // grados que se ignoran alrededor de la posición neutra
+  maxTilt: 45,       // grados a partir de los cuales se alcanza la velocidad máxima
+  maxSpeed: 14,      // píxeles por frame en la inclinación máxima
+};
+
+function getScrollableTargets() {
+  // Devuelve los contenedores que realmente tienen contenido desbordado
+  // en el layout actual (vertical apilado u horizontal en dos columnas).
+  const candidates = [
+    document.querySelector('.board'),
+    document.querySelector('.player-1'),
+    document.querySelector('.player-2'),
+    document.querySelector('.center-zone'),
+  ].filter(Boolean);
+
+  return candidates.filter((el) => el.scrollHeight > el.clientHeight + 2);
+}
+
+function tiltScrollLoop() {
+  if (!tiltScroll.active) return;
+
+  if (Math.abs(tiltScroll.currentDelta) > 0) {
+    const targets = getScrollableTargets();
+    targets.forEach((el) => {
+      el.scrollTop += tiltScroll.currentDelta;
+    });
+  }
+
+  tiltScroll.rafId = requestAnimationFrame(tiltScrollLoop);
+}
+
+function handleDeviceOrientation(event) {
+  if (event.beta === null || event.beta === undefined) return;
+
+  // Calibra la posición neutra con la primera lectura estable que llega.
+  if (tiltScroll.neutralBeta === null) {
+    tiltScroll.neutralBeta = event.beta;
+    return;
+  }
+
+  let diff = event.beta - tiltScroll.neutralBeta;
+
+  // Zona muerta: ignora inclinaciones pequeñas.
+  if (Math.abs(diff) < tiltScroll.deadZone) {
+    tiltScroll.currentDelta = 0;
+    return;
+  }
+
+  diff = diff > 0 ? diff - tiltScroll.deadZone : diff + tiltScroll.deadZone;
+  const clamped = Math.max(-tiltScroll.maxTilt, Math.min(tiltScroll.maxTilt, diff));
+  const speed = (clamped / tiltScroll.maxTilt) * tiltScroll.maxSpeed;
+
+  tiltScroll.currentDelta = speed;
+}
+
+function setTiltButtonState(label, extraClass) {
+  const btn = document.getElementById('tiltScrollBtn');
+  if (!btn) return;
+  btn.classList.remove('active', 'unsupported');
+  if (extraClass) btn.classList.add(extraClass);
+  btn.textContent = label;
+}
+
+function enableTiltScroll() {
+  tiltScroll.active = true;
+  tiltScroll.neutralBeta = null;
+  tiltScroll.currentDelta = 0;
+  window.addEventListener('deviceorientation', handleDeviceOrientation);
+  tiltScroll.rafId = requestAnimationFrame(tiltScrollLoop);
+  setTiltButtonState('📱 Inclinación ON', 'active');
+}
+
+function disableTiltScroll() {
+  tiltScroll.active = false;
+  window.removeEventListener('deviceorientation', handleDeviceOrientation);
+  if (tiltScroll.rafId) {
+    cancelAnimationFrame(tiltScroll.rafId);
+    tiltScroll.rafId = null;
+  }
+  setTiltButtonState('📱 Inclinación');
+}
+
+function initTiltScroll() {
+  const btn = document.getElementById('tiltScrollBtn');
+  if (!btn) return;
+
+  if (typeof DeviceOrientationEvent === 'undefined') {
+    setTiltButtonState('📱 No disponible', 'unsupported');
+    btn.disabled = true;
+    return;
+  }
+
+  btn.addEventListener('click', async () => {
+    if (tiltScroll.active) {
+      disableTiltScroll();
+      return;
+    }
+
+    // iOS 13+ exige pedir permiso explícito dentro de un gesto del usuario.
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      try {
+        const permission = await DeviceOrientationEvent.requestPermission();
+        if (permission !== 'granted') {
+          setTiltButtonState('📱 Permiso denegado', 'unsupported');
+          return;
+        }
+      } catch (err) {
+        setTiltButtonState('📱 Error de permiso', 'unsupported');
+        return;
+      }
+    }
+
+    enableTiltScroll();
+  });
+}
+
 // ====== INICIALIZACIÓN ======
 
 function init() {
@@ -337,6 +466,7 @@ function init() {
   document.getElementById('lp2').textContent = state.lp2;
   renderHistory('1');
   renderHistory('2');
+  initTiltScroll();
 }
 
 init();

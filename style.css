@@ -50,6 +50,12 @@ html, body {
   text-shadow: 0 1px 0 rgba(0,0,0,0.4);
 }
 
+.top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .reset-btn {
   background: #21223a;
   color: #fff;
@@ -62,6 +68,43 @@ html, body {
 }
 .reset-btn:hover { background: #34365a; }
 .reset-btn:active { transform: scale(0.96); }
+
+/* ---------- SCROLL POR INCLINACIÓN (solo móvil) ---------- */
+.tilt-btn {
+  display: none; /* oculto en escritorio, solo tiene sentido en móvil con giroscopio */
+  align-items: center;
+  gap: 6px;
+  background: #21223a;
+  color: #fff;
+  border: 1px solid #444a6e;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+.tilt-btn:active { transform: scale(0.96); }
+
+.tilt-btn.active {
+  background: linear-gradient(180deg, #3fae54, #237a36);
+  border-color: #2a7a3c;
+  box-shadow: 0 0 0 2px rgba(63, 174, 84, 0.35);
+}
+
+.tilt-btn.unsupported {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 820px) {
+  .tilt-btn {
+    display: inline-flex;
+  }
+  .top-bar h1 {
+    font-size: 1rem;
+  }
+}
 
 /* ---------- BOARD ---------- */
 .board {
