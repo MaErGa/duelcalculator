@@ -479,7 +479,18 @@ html, body {
   .board {
     display: flex;
     flex-direction: row;
-    overflow-y: visible;
+    align-items: stretch;
+    /* Antes esto era "overflow-y: visible", lo que dejaba a .board sin
+       límite de altura: al tener overflow visible, su "min-height: auto"
+       pasaba a calcularse según el contenido (no según el alto disponible),
+       así que .board crecía más allá de los 100vh del body y ese trozo
+       sobrante quedaba cortado por el "overflow: hidden" del body, sin
+       ninguna forma de hacer scroll para llegar a él. Ahora es .board
+       quien controla el scroll vertical de las dos columnas a la vez. */
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0; /* evita que .board se estire más allá del alto disponible */
+    -webkit-overflow-scrolling: touch; /* scroll con inercia en iOS antiguo */
   }
 
   .player {
@@ -488,8 +499,8 @@ html, body {
     justify-content: flex-start;
     padding-top: 14px;
     gap: 8px;
-    overflow-y: auto;
-    max-height: 100%;
+    overflow: visible; /* ya no scrollea la columna, scrollea .board */
+    max-height: none;
   }
 
   .center-zone {
@@ -499,8 +510,8 @@ html, body {
     border-bottom: none;
     border-left: 1px solid #1d2038;
     border-right: 1px solid #1d2038;
-    overflow-y: auto;
-    max-height: 100%;
+    overflow: visible; /* ya no scrollea la columna, scrollea .board */
+    max-height: none;
     gap: 10px;
     padding: 10px 8px;
   }
